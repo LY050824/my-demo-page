@@ -1,0 +1,95 @@
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>账单演示页面</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#f2f4f7;font-family:-apple-system,BlinkMacSystemFont,"PingFang SC",sans-serif;color:#222}
+header{background:#1677ff;color:white;padding:18px;text-align:center;font-size:20px;font-weight:600}
+main{max-width:520px;margin:auto;padding:16px}
+.panel,.receipt{background:white;border-radius:14px;padding:18px;margin-bottom:16px}
+h3{margin:0 0 14px}
+label{display:block;font-size:14px;color:#555;margin:12px 0 6px}
+input{width:100%;padding:12px;border:1px solid #d8dde5;border-radius:8px;font-size:16px}
+button{width:100%;border:0;border-radius:9px;padding:13px;margin-top:10px;background:#1677ff;color:white;font-size:16px}
+button.secondary{background:#e8f1ff;color:#1765c1}
+.notice{color:#b45309;background:#fff7e6;padding:10px;border-radius:8px;font-size:13px;text-align:center}
+.amount{text-align:center;font-size:32px;font-weight:700;margin:20px 0}
+.line{display:flex;justify-content:space-between;gap:12px;padding:12px 0;border-bottom:1px solid #eee}
+.line span:first-child{color:#777}
+.line span:last-child{text-align:right;overflow-wrap:anywhere}
+.small{font-size:12px;color:#888;text-align:center;margin-top:14px}
+@media print{header,.panel,.actions{display:none!important}body{background:white}.receipt{box-shadow:none}}
+</style>
+</head>
+<body>
+<header>账单详情（演示）</header>
+<main>
+<section class="panel">
+<h3>编辑演示信息</h3>
+<label>金额</label>
+<input id="amount" value="128.00" inputmode="decimal">
+<label>收款人</label>
+<input id="person" value="演示收款人">
+<label>收款账号</label>
+<input id="account" value="DEMO-000000">
+<label>交易时间</label>
+<input id="time" type="datetime-local">
+<label>订单编号</label>
+<input id="order" value="DEMO-20261026-0001">
+<button onclick="updatePreview()">更新预览</button>
+</section>
+
+<section class="receipt" id="receipt">
+<div class="notice">演示页面 · 非官方交易凭证</div>
+<div class="amount">¥ <span id="vAmount">128.00</span></div>
+<div class="line"><span>交易状态</span><span>演示数据</span></div>
+<div class="line"><span>收款人</span><span id="vPerson">演示收款人</span></div>
+<div class="line"><span>收款账号</span><span id="vAccount">DEMO-000000</span></div>
+<div class="line"><span>交易时间</span><span id="vTime">未设置</span></div>
+<div class="line"><span>订单编号</span><span id="vOrder">DEMO-20261026-0001</span></div>
+<p class="small">本页面仅用于界面演示，信息不代表真实交易。</p>
+</section>
+
+<section class="panel actions">
+<h3>导出与发送</h3>
+<button onclick="downloadPDF()">生成 PDF</button>
+<button class="secondary" onclick="sendMail()">打开邮件应用</button>
+<p class="small">PDF 可通过系统打印功能保存。邮件发送需要你在邮件应用中确认。</p>
+</section>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+function updatePreview(){
+  $("vAmount").textContent=$("amount").value||"0.00";
+  $("vPerson").textContent=$("person").value||"未填写";
+  $("vAccount").textContent=$("account").value||"未填写";
+  $("vOrder").textContent=$("order").value||"未填写";
+  const t=$("time").value;
+  $("vTime").textContent=t?t.replace("T"," "):"未设置";
+}
+function downloadPDF(){
+  updatePreview();
+  window.print();
+}
+function sendMail(){
+  updatePreview();
+  const subject=encodeURIComponent("账单演示资料");
+  const body=encodeURIComponent(
+    "您好，以下是账单演示页面的相关信息。\n"+
+    "金额：¥"+$("amount").value+"\n"+
+    "收款人："+$("person").value+"\n"+
+    "时间："+$("vTime").textContent+"\n"+
+    "订单编号："+$("order").value+"\n\n"+
+    "说明：此内容为演示资料，非官方交易凭证。"
+  );
+  window.location.href="mailto:osuyytej@foxmail.com?subject="+subject+"&body="+body;
+}
+$("time").value=new Date(Date.now()-new Date().getTimezoneOffset()*60000).toISOString().slice(0,16);
+updatePreview();
+</script>
+</body>
+</html>
